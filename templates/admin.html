@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link href="{{ url_for('static', path='/styles.css') }}" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="/static/images/favicon.ico">
+</head>
+<body>
+
+    <div class="dashboard-container">
+        
+        <aside class="sidebar">
+            <div class="logo">BeanLearn</div>
+            <ul class="sidebar-menu">
+                <li class="active">Dashboard</li>
+                <li>View users</li>
+                <li>Manage courses</li>
+                <li>Monitor</li>
+                <li><a href="/logout" class="btn btn-primary">Logout</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            
+            <header class="dashboard-header">
+                <div>
+                    <h1>Welcome, admin</h1>
+                </div>
+            </header>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-title">Active users</div>
+                    <div class="stat-value cyan">25</div>
+                </div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-title">Active courses</div>
+                    <div class="stat-value purple">200</div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+</body>
+</html>

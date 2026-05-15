@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard</title>
+    <link href="{{ url_for('static', path='/styles.css') }}" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="/static/images/favicon.ico">
+</head>
+<body>
+
+    <div class="dashboard-container">
+        
+        <aside class="sidebar">
+            <div class="logo">BeanLearn</div>
+            <ul class="sidebar-menu">
+                <li class="active">Dashboard</li>
+                <li>Enrolled Courses</li>
+                <li>Extra Courses</li>
+                <li>My Progress</li>
+                <li>Settings</li>
+                <li><a href="/logout" class="btn btn-primary">Logout</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            
+            <header class="dashboard-header">
+                <div>
+                    <h1>Welcome back, {{user_data}}</h1>
+                    <p>You've learned 70% of your goal this week. Keep it up!</p>
+                </div>
+                
+                <div class="streak-widget">
+                    <div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: bold; text-transform: uppercase;">Current Streak</div>
+                        <div class="streak-number">🔥 12 Days</div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-title">Courses Enrolled</div>
+                    <div class="stat-value purple">4</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Total Hours Studied</div>
+                    <div class="stat-value">34.5</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Lessons Completed</div>
+                    <div class="stat-value cyan">128</div>
+                </div>
+            </div>
+
+            <h2 style="margin-bottom: 20px; color: var(--sidebar-bg);">Continue Learning</h2>
+            
+            <div class="course-card">
+                <div class="course-info">
+                    <h3>Spanish for Beginners</h3>
+                    <p>Module 3: Everyday Conversations • Lesson 4</p>
+                    <div style="margin-bottom: 8px; font-weight: bold; color: var(--primary-purple); font-size: 0.9rem;">Progress: 65%</div>
+                    <div class="progress-track">
+                        <div class="progress-fill"></div>
+                    </div>
+                </div>
+                <div>
+                    <button class="btn btn-primary">Resume Lesson</button>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+</body>
+</html>
