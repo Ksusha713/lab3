@@ -1,14 +1,10 @@
-users = {
-    "admin": {
-        "password": "admin1234",
-        "role": "admin",
-    },
-    "ksusha": {
-        "password": "200ksenia200",
-        "role": "student",
-    },
-    "alaa": {
-        "password": "toalaa10",
-        "role": "student",
-    }
-}
+import sqlite3
+import bcrypt
+
+connection = sqlite3.connect("users.db")
+cursor = connection.cursor()
+
+cursor.execute("PRAGMA foreign_keys = ON")
+
+cursor.execute("CREATE TABLE IF NOT EXISTS users(userID INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE NOT NULL, password TEXT NOT NULL)")
+

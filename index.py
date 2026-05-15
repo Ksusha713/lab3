@@ -64,18 +64,18 @@ async def signup(data: Annotated[SignUpForm, Form()], request: Request):
 @app.post("/login")
 async def login(data: Annotated[LoginForm, Form()], request: Request):
     profile = users[data.username]
-    if profile["password"] != data.password:
-        return templates.TemplateResponse(
-            request=request, name="login.html", context={"error": "The username or password is not correct!"}
-        )
     if data.username not in users:
         return templates.TemplateResponse(
             request=request, name="login.html", context={"error": "The username doesn't exist. Try to sign up!"}
         )
+    if profile["password"] != data.password:
+        return templates.TemplateResponse(
+            request=request, name="login.html", context={"error": "The username or password is not correct!"}
+        )
     if profile["role"] == "student":
         response = RedirectResponse(url="/user", status_code=status.HTTP_303_SEE_OTHER)
         response.set_cookie(key="user", value=data.username)
-    if profile["role"] == "admin":
+    else:
         response = RedirectResponse(url="/admin", status_code=status.HTTP_303_SEE_OTHER)
         response.set_cookie(key="user", value=data.username)
     return response
