@@ -4,8 +4,8 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import fastapi.templating
 from typing import Annotated
-from data.usersdb import users
-
+from data.usersdb import create_user, get_user
+from data.coursesdb import create_course, get_all_courses
 app = FastAPI()
 favicon_path = 'static/images/favicon.ico'
 
