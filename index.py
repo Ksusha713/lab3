@@ -1,10 +1,10 @@
-from fastapi import FastAPI, Request, Form, status
+from fastapi import FastAPI, Request, Form, status, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import fastapi.templating
 from typing import Annotated
-from data.db import create_course, get_all_courses, create_db_and_tables
+from data.db import create_course, get_all_courses, create_db_and_tables, get_session, create_user, get_user, hash_password, check_password
 from sqlmodel import Session
 
 app = FastAPI()
@@ -44,11 +44,7 @@ async def dashboard(request: Request):
     )
     
 @app.post("/signup")
-async def signup(data: Annotated[SignUpForm, Form()], request: Request):
-    if data.username in users:
-        return templates.TemplateResponse(
-            request=request, name="signup.html", context={"error": "Username is already taken!"}
-        )
+async def signup(data: Annotated[SignUpForm, Form()], request: Request, session: Session = Depends(get_session)):
     if len(data.password) < 8:
         return templates.TemplateResponse(
             request=request, name="signup.html", context={"error": "Password is too short!"}
@@ -57,30 +53,33 @@ async def signup(data: Annotated[SignUpForm, Form()], request: Request):
         return templates.TemplateResponse(
             request=request, name="signup.html", context={"error": "Passwords do not match!"}
         )
-    users[data.username] = {
-        "password": data.password,
-        "role": "student"
-    }
-    print(f"New user registered! Current DB: {users}")
+    already_user = get_user(session, data.username)
+    if already_user:
+        return templates.TemplateResponse(
+            request=request, name="signup.html", context={"error": "Username is already taken!"}
+        )
+    user_role = "admin" if data.username.lower() == "admin" else "student"
+    create_user(session, data.username, data.password, role=user_role)
+    print(f"New user registered! {data.username}")
     return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
 
 @app.post("/login")
-async def login(data: Annotated[LoginForm, Form()], request: Request):
-    profile = users[data.username]
-    if data.username not in users:
+async def login(data: Annotated[LoginForm, Form()], request: Request, session: Session = Depends(get_session)):
+    user = get_user(session, data.username)
+    if not user:
         return templates.TemplateResponse(
             request=request, name="login.html", context={"error": "The username doesn't exist. Try to sign up!"}
         )
-    if profile["password"] != data.password:
+    if not check_password(data.password, user.password):
         return templates.TemplateResponse(
             request=request, name="login.html", context={"error": "The username or password is not correct!"}
         )
-    if profile["role"] == "student":
+    if user.role == "student":
         response = RedirectResponse(url="/user", status_code=status.HTTP_303_SEE_OTHER)
-        response.set_cookie(key="user", value=data.username)
+        response.set_cookie(key="user", value=user.name)
     else:
         response = RedirectResponse(url="/admin", status_code=status.HTTP_303_SEE_OTHER)
-        response.set_cookie(key="user", value=data.username)
+        response.set_cookie(key="user", value=user.name)
     return response
 
 @app.get("/user", response_class=HTMLResponse)
