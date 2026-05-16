@@ -4,14 +4,17 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import fastapi.templating
 from typing import Annotated
-from data.usersdb import create_user, get_user
-from data.coursesdb import create_course, get_all_courses
+from data.db import create_course, get_all_courses, create_db_and_tables
+from sqlmodel import Session
+
 app = FastAPI()
 favicon_path = 'static/images/favicon.ico'
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = fastapi.templating.Jinja2Templates(directory = "templates")
+
+create_db_and_tables()
 
 @app.get("/", response_class = HTMLResponse)
 async def read_root(request: Request):
