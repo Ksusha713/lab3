@@ -16,7 +16,7 @@ def create_db_and_tables():
     SQLModel.metadata.create_all(engine)
 
 def create_course(session: Session, title: str, teacher: str, credit: int, semester: int):
-    new_course = Course(title=title, teacher=teacher, credits=credit, semester=semester)
+    new_course = Course(title=title, teacher=teacher, credit=credit, semester=semester)
     session.add(new_course)
     session.commit()
     session.refresh(new_course)
@@ -44,6 +44,11 @@ def get_user(session: Session, username: str):
     statement = select(User).where(User.name == username)
     results = session.exec(statement).first()
     return results
+
+def get_all_users(session: Session):
+    statement = select(User)
+    results = session.exec(statement)
+    return results.all()
 
 def check_password(password: str, hashed_password: str) -> bool:
     return bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8'))

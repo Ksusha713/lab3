@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import fastapi.templating
 from typing import Annotated
-from data.db import create_course, get_all_courses, create_db_and_tables, get_session, create_user, get_user, hash_password, check_password
+from data.db import create_course, get_all_courses, create_db_and_tables, get_session, create_user, get_user, check_password, get_all_users
 from sqlmodel import Session
 
 app = FastAPI()
@@ -88,13 +88,23 @@ async def dashboard(request: Request):
     return templates.TemplateResponse(
         "userboard.html", {"request": request, "user_data": user_data}
     )
-@app.get("/admin", response_class=HTMLResponse)
-async def dashboard(request: Request):
-    user_data = request.cookies.get("user")
-    return templates.TemplateResponse(
-        "admin.html", {"request": request, "user_data": user_data}
-    )
     
+@app.get("/admin", response_class=HTMLResponse)
+async def dashboard(request: Request, session: Session = Depends(get_session)):
+    user_data = request.cookies.get("user")
+    if not user_data:
+        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+    courses_list = get_all_courses(session)
+    users_list = get_all_users(session)
+    return templates.TemplateResponse(
+        "admin.html", {"request": request, "user_data": user_data, "courses": courses_list, "users": users_list}
+    )
+
+@app.post("/admin/courses/add")
+async def admin_add_course(title: Annotated[str, Form()], teacher: Annotated[str, Form()], credit: Annotated[int, Form()], semester: Annotated[int, Form()], session: Session = Depends(get_session)):
+    create_course(session, title=title, teacher=teacher, credit=credit, semester=semester)
+    return RedirectResponse(url="/admin", status_code=status.HTTP_303_SEE_OTHER)
+  
 @app.get("/logout", response_class=HTMLResponse)
 async def logout():
     response = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER) 
